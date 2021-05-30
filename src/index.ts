@@ -1,7 +1,7 @@
-import fetch from 'node-fetch'
-import {visit} from 'unist-util-visit';
-import {Transformer} from 'unified';
-import {Node} from 'unist';
+import fetch from 'node-fetch';
+import visit from 'unist-util-visit';
+import { Transformer } from 'unified';
+import { Node } from 'unist';
 import extractTagSection from './utils/extractTagSection';
 import extractMetadataArguments from './utils/extractMetadataArguments';
 
@@ -9,26 +9,37 @@ interface NodeWithMeta extends Node {
   meta?: string;
 }
 
-export function remarkFetchCode(): Transformer {
-  return function transformer(node): void {
-    const codes: [NodeWithMeta, number | null, NodeWithMeta | null][] = [];
+interface PluginOptions {
+  sourceDomain?: string;
+}
+
+export function remarkFetchCode(options?: PluginOptions): Transformer {
+  return async function transformer(tree): Promise<void> {
+    const codeTypeNodes: NodeWithMeta[] = [];
     const promises = [];
 
-    visit(node, 'code', (node, index, parent) => codes.push([node, index, parent]));
+    visit(tree, 'code', node => codeTypeNodes.push(node));
 
-    for (const [node] of codes) {
+    for (const node of codeTypeNodes) {
       if (!node.meta) {
-        throw new Error(`Not found meta information`);
+        return;
       }
 
-      const {url, tag} = extractMetadataArguments(node.meta);
+      const { url, tag } = extractMetadataArguments(node.meta);
+
+      if (!url) {
+        return;
+      }
+
+      const urlWithDomainFromOptions = (options && options.sourceDomain) ? new URL(url, options.sourceDomain) : url;
+
       promises.push(
         new Promise((resolve, reject) => {
-          fetch(url)
+          fetch(urlWithDomainFromOptions.toString())
             .then(res => res.text())
             .then(fileContent => {
-              node.value = extractTagSection(fileContent, tag).trim();
-              resolve(undefined);
+              node.value = extractTagSection(fileContent, tag).replace(/\t/g, ' ').trim();
+              resolve(node);
             })
             .catch(err => reject(err));
         })
@@ -36,7 +47,7 @@ export function remarkFetchCode(): Transformer {
     }
 
     if (promises.length) {
-      Promise.all(promises);
+      await Promise.all(promises);
     }
   };
 }

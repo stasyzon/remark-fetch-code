@@ -1,4 +1,4 @@
-import {EOL} from 'os';
+import { EOL } from 'os';
 
 export default function extractTagSection(content: string, codeTag?: string) {
   if (!codeTag) {
@@ -17,7 +17,7 @@ export default function extractTagSection(content: string, codeTag?: string) {
     if (line.includes(`END ${codeTag}`)) {
       indexOfLastString = index;
     }
-  })
+  });
 
   return lines.slice(indexOfStartString, indexOfLastString).join('\n');
 }

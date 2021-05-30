@@ -11,8 +11,8 @@
     "node": ">=10"
   },
   "scripts": {
-    "start": "tsdx watch",
-    "build": "tsdx build",
+    "start": "tsdx watch --target node",
+    "build": "tsdx build --target node",
     "test": "tsdx test",
     "lint": "tsdx lint",
     "prepare": "tsdx build",
@@ -47,6 +47,7 @@
   "devDependencies": {
     "@size-limit/preset-small-lib": "^4.11.0",
     "husky": "^6.0.0",
+    "remark": "^13.0.0",
     "size-limit": "^4.11.0",
     "tsdx": "^0.14.1",
     "tslib": "^2.2.0",
@@ -56,6 +57,6 @@
     "@types/node-fetch": "^2.5.10",
     "node-fetch": "^2.6.1",
     "unified": "^9.2.1",
-    "unist-util-visit": "^3.1.0"
+    "unist-util-visit": "^2.0.3"
   }
 }

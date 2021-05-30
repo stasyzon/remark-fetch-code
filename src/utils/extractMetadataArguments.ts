@@ -1,4 +1,6 @@
-export default function extractMetadataArguments(meta = ''): {url: string, tag: string | undefined} {
+export default function extractMetadataArguments(
+  meta = ''
+): { url: string | undefined; tag: string | undefined } {
   const metadataArguments = meta.split(' ');
   let url: string | undefined;
   let tag: string | undefined;
@@ -13,9 +15,5 @@ export default function extractMetadataArguments(meta = ''): {url: string, tag: 
     }
   }
 
-  if (!url) {
-    throw new Error('Cannot parse url meta argument')
-  }
-
-  return {url, tag}
+  return { url, tag };
 }
