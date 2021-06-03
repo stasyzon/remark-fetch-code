@@ -22,20 +22,22 @@ export function remarkFetchCode(options?: PluginOptions): Transformer {
 
     for (const node of codeTypeNodes) {
       if (!node.meta) {
-        return;
+        promises.push(new Promise((resolve) => resolve(node)));
+        continue;
       }
 
       const { url, tag } = extractMetadataArguments(node.meta);
 
       if (!url) {
-        return;
+        promises.push(new Promise((resolve) => resolve(node)));
+        continue;
       }
 
-      const urlWithDomainFromOptions = (options && options.sourceDomain) ? new URL(url, options.sourceDomain) : url;
+      const urlWithDomainFromOptions = (options && options.sourceDomain) ? options.sourceDomain + url : url;
 
       promises.push(
         new Promise((resolve, reject) => {
-          fetch(urlWithDomainFromOptions.toString())
+          fetch(urlWithDomainFromOptions)
             .then(res => res.text())
             .then(fileContent => {
               node.value = extractTagSection(fileContent, tag).replace(/\t/g, ' ').trim();
