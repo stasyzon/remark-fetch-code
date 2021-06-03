@@ -2,6 +2,7 @@ import fetch from 'node-fetch';
 import visit from 'unist-util-visit';
 import { Transformer } from 'unified';
 import { Node } from 'unist';
+import urlJoin from 'url-join';
 import extractTagSection from './utils/extractTagSection';
 import extractMetadataArguments from './utils/extractMetadataArguments';
 
@@ -10,10 +11,10 @@ interface NodeWithMeta extends Node {
 }
 
 interface PluginOptions {
-  sourceDomain?: string;
+  pathPrefix?: string;
 }
 
-export function remarkFetchCode(options?: PluginOptions): Transformer {
+export default function remarkFetchCode(options?: PluginOptions): Transformer {
   return async function transformer(tree): Promise<void> {
     const codeTypeNodes: NodeWithMeta[] = [];
     const promises = [];
@@ -33,14 +34,16 @@ export function remarkFetchCode(options?: PluginOptions): Transformer {
         continue;
       }
 
-      const urlWithDomainFromOptions = (options && options.sourceDomain) ? options.sourceDomain + url : url;
+      const urlWithDomainFromOptions = (options && options.pathPrefix) ?
+        urlJoin(options.pathPrefix, url) :
+        url;
 
       promises.push(
         new Promise((resolve, reject) => {
           fetch(urlWithDomainFromOptions)
             .then(res => res.text())
             .then(fileContent => {
-              node.value = extractTagSection(fileContent, tag).replace(/\t/g, ' ').trim();
+              node.value = extractTagSection(fileContent, tag);
               resolve(node);
             })
             .catch(err => reject(err));

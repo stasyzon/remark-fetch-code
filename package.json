@@ -46,6 +46,7 @@
   ],
   "devDependencies": {
     "@size-limit/preset-small-lib": "^4.11.0",
+    "@types/url-join": "^4.0.0",
     "husky": "^6.0.0",
     "remark": "^13.0.0",
     "size-limit": "^4.11.0",
@@ -57,6 +58,7 @@
     "@types/node-fetch": "^2.5.10",
     "node-fetch": "^2.6.1",
     "unified": "^9.2.1",
-    "unist-util-visit": "^2.0.3"
+    "unist-util-visit": "^2.0.3",
+    "url-join": "^4.0.1"
   }
 }
