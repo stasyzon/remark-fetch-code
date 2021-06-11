@@ -5,6 +5,7 @@ import { Node } from 'unist';
 import urlJoin from 'url-join';
 import extractTagSection from './utils/extractTagSection';
 import extractMetadataArguments from './utils/extractMetadataArguments';
+import replaceTabsToSpaces from './utils/replaceTabsToSpaces';
 
 interface NodeWithMeta extends Node {
   meta?: string;
@@ -12,6 +13,7 @@ interface NodeWithMeta extends Node {
 
 interface PluginOptions {
   pathPrefix?: string;
+  replaceTabsToSpaces?: boolean
 }
 
 export default function remarkFetchCode(options?: PluginOptions): Transformer {
@@ -44,6 +46,9 @@ export default function remarkFetchCode(options?: PluginOptions): Transformer {
             .then(res => res.text())
             .then(fileContent => {
               node.value = extractTagSection(fileContent, tag);
+              if (options?.replaceTabsToSpaces) {
+                node.value = replaceTabsToSpaces(node.value as string);
+              }
               resolve(node);
             })
             .catch(err => reject(err));

@@ -33,6 +33,10 @@ function removeNonSpaceOnStart(lines: string[]): string[] {
   lines.forEach(line => {
     const spaceMatchOnStringStart = line.match(/^\s+/);
 
+    if (!line) {
+      return;
+    }
+
     if (!spaceMatchOnStringStart || !spaceMatchOnStringStart[0]) {
       minimumSpaceCharacters = 0;
       return;

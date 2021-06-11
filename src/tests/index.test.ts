@@ -98,4 +98,28 @@ describe('Transform checks', () => {
       '```js url=/path/to/code.js tag=REGION_1\nconst a = 1\n\tconst b = 1\n```\n'
     );
   })
+
+  test('should remove unnecessary tabs if asset contain empty string', async () => {
+    mockedFetch.mockReturnValueOnce(Promise.resolve(new Response('\t\tconst a = 1\n\n\t\t\tconst b = 1')))
+
+    const result = await remark()
+      .use(remarkFetchCode)
+      .process('```js url=/path/to/code.js tag=REGION_1\n```');
+
+    expect(result.contents).toEqual(
+      '```js url=/path/to/code.js tag=REGION_1\nconst a = 1\n\n\tconst b = 1\n```\n'
+    );
+  })
+
+  test('should replace tabs to spaces option provided', async () => {
+    mockedFetch.mockReturnValueOnce(Promise.resolve(new Response('\t\tconst a = 1\n\n\t\t\tconst b = 1')))
+
+    const result = await remark()
+      .use(remarkFetchCode, {replaceTabsToSpaces: true})
+      .process('```js url=/path/to/code.js\n```');
+
+    expect(result.contents).toEqual(
+      '```js url=/path/to/code.js\n    const a = 1\n\n      const b = 1\n```\n'
+    );
+  })
 });
