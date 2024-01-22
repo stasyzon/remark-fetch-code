@@ -104,7 +104,13 @@ function remarkFetchCode(options) {
 
       const urlWithDomainFromOptions = options && options.pathPrefix ? urlJoin(options.pathPrefix, url) : url;
       promises.push(new Promise((resolve, reject) => {
-        fetch(urlWithDomainFromOptions).then(res => res.text()).then(fileContent => {
+        fetch(urlWithDomainFromOptions).then(res => {
+          if (res.status !== 200) {
+            console.log(`Error fetching ${urlWithDomainFromOptions} - status ${res.status}`);
+          }
+
+          return res.text();
+        }).then(fileContent => {
           node.value = extractTagSection(fileContent, tag);
 
           if (options != null && options.replaceTabsToSpaces) {
@@ -112,7 +118,10 @@ function remarkFetchCode(options) {
           }
 
           resolve(node);
-        }).catch(err => reject(err));
+        }).catch(err => {
+          console.log(`Error fetching ${urlWithDomainFromOptions}`);
+          reject(err);
+        });
       }));
     }
 

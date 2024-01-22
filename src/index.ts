@@ -43,7 +43,12 @@ export default function remarkFetchCode(options?: PluginOptions): Transformer {
       promises.push(
         new Promise((resolve, reject) => {
           fetch(urlWithDomainFromOptions)
-            .then(res => res.text())
+            .then(res => {
+              if (res.status !== 200) {
+                console.log(`Error fetching ${urlWithDomainFromOptions} - status ${res.status}`);
+              }
+              return res.text();
+            })
             .then(fileContent => {
               node.value = extractTagSection(fileContent, tag);
               if (options?.replaceTabsToSpaces) {
@@ -51,7 +56,10 @@ export default function remarkFetchCode(options?: PluginOptions): Transformer {
               }
               resolve(node);
             })
-            .catch(err => reject(err));
+            .catch(err => {
+              console.log(`Error fetching ${urlWithDomainFromOptions}`);
+              reject(err);
+            });
         })
       );
     }
